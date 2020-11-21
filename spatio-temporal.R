@@ -1,8 +1,15 @@
-#################################################
-#################################################
-################################################# load packages
-#################################################
-#################################################
+################################################################################
+################################################################################
+################################spatio-temporal-Images##########################
+################################################################################
+################################################################################
+
+####################################################################
+####################################################################
+#########################Load Packages##############################
+####################################################################
+####################################################################
+
 pkg = c("devtools","dplyr","plyr","lattice","tibble","rgdal","rgl","parallel",
         "tidyverse","tidyr","XML","sp","sf","spatstat","spatstat.utils",
         "stlnpp","sparr","stplanr","raster","ggplot2","ggthemes","viridis",
@@ -10,32 +17,40 @@ pkg = c("devtools","dplyr","plyr","lattice","tibble","rgdal","rgl","parallel",
         "ggvis","gganimate","gridExtra")
 install.packages(pkg)
 easypackages::libraries(pkg)
-#################################################
-#################################################
-################################################# load data
-#################################################
-#################################################
 
-load("D:/Github/Honnover-Analysis/HI_AC_LN_ppp/HI_LN_AC_unique.RData") ###  main
+####################################################################
+####################################################################
+#########################Load data##################################
+####################################################################
+####################################################################
 
+load("D:/GEO-C/Github/Honnover-Analysis/HI_AC_LN_ppp/HI_LN_AC_unique.RData")
+load("D:/Github/Honnover-Analysis/HI_AC_LN_ppp/HI_LN_AC_unique.RData")
 HI_LN_AC_unique
 
-#################################################
-#################################################
-################################################# change of name
-#################################################
-#################################################
+####################################################################
+####################################################################
+##########################Change names##############################
+####################################################################
+####################################################################
 
 X <- HI_LN_AC_unique
 X_unmark <- unmark(X)
-
 npoints(X_unmark)
 
-#################################################
-#################################################
-################################################# spatio-temporal by hour
-#################################################
-#################################################
+####################################################################
+####################################################################
+##############################Hour##################################
+####################################################################
+####################################################################
+
+################################################
+################################################
+####################Kernel######################
+################################################
+################################################
+
+library(stlnpp)
 
 hour <- as.numeric(X$data$Time) # extract time
 
@@ -112,6 +127,12 @@ for (j in h8) {
 out_h_8 <- out_h_8 -  d_X_hour[[1]]
 plot(out_h_8) 
 
+################################################
+################################################
+####################Image#######################
+################################################
+################################################
+
 im_d_h_1 <- raster(as.im(out_h_1))
 im_d_h_2 <- raster(as.im(out_h_2))
 im_d_h_3 <- raster(as.im(out_h_3))
@@ -120,9 +141,10 @@ im_d_h_5 <- raster(as.im(out_h_5))
 im_d_h_6 <- raster(as.im(out_h_6))
 im_d_h_7 <- raster(as.im(out_h_7))
 im_d_h_8 <- raster(as.im(out_h_8))
+
 out_h_stack <- stack(im_d_h_1,im_d_h_2,im_d_h_3,im_d_h_4,im_d_h_5,im_d_h_6,im_d_h_7,im_d_h_8)
 names(out_h_stack)=c("Midnight_h3am","h3am_h6am)","h6am_h9am","h9am_Noon",
-                     "Noon_h15pm","h15pm_h18pm","h18pm_h21pm","h21pm_h24pm")
+                     "Noon_h3pm","h3pm_h6pm","h6pm_h9pm","h9pm_Midnight")
 
 qtss_h <- as.vector(sort(c(quantile(im_d_h_1*1000,seq(0,1,len=20)),
                                quantile(im_d_h_2*1000,seq(0,1,len=20)),
@@ -138,170 +160,196 @@ spplot(out_h_stack*1000,at=qtss_h,col.regions=c(viridis(160),rep("#f03b20",2)),
        par.settings=list(fontsize=list(text=18)),colorkey=list(lables=list(cex=1.5,cex.main=1.5)))                      
 dev.off()
 
-#################################################
-#################################################
-################################################# spatio-temporal by week
-#################################################
-#################################################
-week <- as.numeric(X$data$Weekday)
-X_week <- as.stlpp(X_unmark,t=week)
+####################################################################
+####################################################################
+##############################Weekday###############################
+####################################################################
+####################################################################
 
-as.tpp.stlpp(X_week)
-plot(.Last.value)
-plot(X_week)
+################################################
+################################################
+####################Kernel######################
+################################################
+################################################
 
-d_X_week <- density(X_week,dimyx=256)
+# week <- as.numeric(X$data$Weekday)
+# X_week <- as.stlpp(X_unmark,t=week)
+# 
+# as.tpp.stlpp(X_week)
+# plot(.Last.value)
+# plot(X_week)
+# 
+# d_X_week <- density(X_week,dimyx=256)
+# 
+# plot(attr(d_X_week,"tempden")) # density plot
+# 
+# wgrid <- attr(d_X_week,"tempden")$x
+# w1 <- which(wgrid <1.5)
+# w2 <- which(wgrid>=1.5 & wgrid<2.5)
+# w3 <- which(wgrid>=2.5 & wgrid<3.5)
+# w4 <- which(wgrid>=3.5 & wgrid<4.5)
+# w5 <- which(wgrid>=4.5 & wgrid<5.5)
+# w6 <- which(wgrid>=5.5 & wgrid<6.5)
+# w7 <- which(wgrid>=6.5)
+# 
+# out_w_1 <- d_X_week[[1]] 
+# for (j in w1) { 
+#   out_w_1 <- out_w_1+d_X_week[[j]]
+# }
+# out_w_1 <- out_w_1 -  d_X_week[[1]]
+# plot(out_w_1)
+# 
+# out_w_2 <- d_X_week[[2]] 
+# for (j in w2) { 
+#   out_w_2 <- out_w_2+d_X_week[[j]]
+# }
+# out_w_2 <- out_w_2 -  d_X_week[[2]]
+# plot(out_w_2)
+# 
+# out_w_3 <- d_X_week[[3]] 
+# for (j in w3) { 
+#   out_w_3 <- out_w_3+d_X_week[[j]]
+# }
+# out_w_3 <- out_w_3 -  d_X_week[[3]]
+# plot(out_w_3)
+# 
+# out_w_4 <- d_X_week[[4]] 
+# for (j in w4) { 
+#   out_w_4 <- out_w_4+d_X_week[[j]]
+# }
+# out_w_4 <- out_w_4 -  d_X_week[[4]]
+# plot(out_w_4)
+# 
+# out_w_5 <- d_X_week[[5]] 
+# for (j in w5) { 
+#   out_w_5 <- out_w_5+d_X_week[[j]]
+# }
+# out_w_5 <- out_w_5 -  d_X_week[[5]]
+# plot(out_w_5)
+# 
+# out_w_6 <- d_X_week[[6]] 
+# for (j in w6) { 
+#   out_w_6 <- out_w_6+d_X_week[[j]]
+# }
+# out_w_6 <- out_w_6 -  d_X_week[[6]]
+# plot(out_w_6)
+# 
+# out_w_7 <- d_X_week[[7]] 
+# for (j in w7) { 
+#   out_w_7 <- out_w_7+d_X_week[[j]]
+# }
+# out_w_7 <- out_w_7 -  d_X_week[[7]]
+# plot(out_w_7)
 
-plot(attr(d_X_week,"tempden")) # density plot
+################################################
+################################################
+####################Image#######################
+################################################
+################################################
 
-wgrid <- attr(d_X_week,"tempden")$x
-w1 <- which(wgrid <1.5)
-w2 <- which(wgrid>=1.5 & wgrid<2.5)
-w3 <- which(wgrid>=2.5 & wgrid<3.5)
-w4 <- which(wgrid>=3.5 & wgrid<4.5)
-w5 <- which(wgrid>=4.5 & wgrid<5.5)
-w6 <- which(wgrid>=5.5 & wgrid<6.5)
-w7 <- which(wgrid>=6.5)
+# im_d_w_1 <- raster(as.im(out_w_1))
+# im_d_w_2 <- raster(as.im(out_w_2))
+# im_d_w_3 <- raster(as.im(out_w_3))
+# im_d_w_4 <- raster(as.im(out_w_4))
+# im_d_w_5 <- raster(as.im(out_w_5))
+# im_d_w_6 <- raster(as.im(out_w_6))
+# im_d_w_7 <- raster(as.im(out_w_7))
+# 
+# out_w_stack <- stack(im_d_w_1,im_d_w_2,im_d_w_3,im_d_w_4,im_d_w_5,im_d_w_6,im_d_w_7)
+# names(out_w_stack)=c('Sun.','Mon.','Tue.','Wed.','Thu.','Fri.','Sat.')
+# 
+# qtss_w <- as.vector(sort(c(quantile(im_d_w_1*1000,seq(0,1,len=20)),
+#                            quantile(im_d_w_2*1000,seq(0,1,len=20)),
+#                            quantile(im_d_w_3*1000,seq(0,1,len=20)),
+#                            quantile(im_d_w_4*1000,seq(0,1,len=20)),
+#                            quantile(im_d_w_5*1000,seq(0,1,len=20)),
+#                            quantile(im_d_w_6*1000,seq(0,1,len=20)),
+#                            quantile(im_d_w_7*1000,seq(0,1,len=20)))))
+# 
+# png("im_d_w.png",height = 500,width = 800)
+# spplot(out_w_stack*1000,at=qtss_w,col.regions=c(viridis(140),rep("#f03b20",6)),
+#        par.settings=list(fontsize=list(text=18)),colorkey=list(lables=list(cex=1.5,cex.main=1.5)))                      
+# dev.off()
 
-out_w_1 <- d_X_week[[1]] 
-for (j in w1) { 
-  out_w_1 <- out_w_1+d_X_week[[j]]
-}
-out_w_1 <- out_w_1 -  d_X_week[[1]]
-plot(out_w_1)
+####################################################################
+####################################################################
+##############################Season################################
+####################################################################
+####################################################################
 
-out_w_2 <- d_X_week[[2]] 
-for (j in w2) { 
-  out_w_2 <- out_w_2+d_X_week[[j]]
-}
-out_w_2 <- out_w_2 -  d_X_week[[2]]
-plot(out_w_2)
+################################################
+################################################
+####################Kernel######################
+################################################
+################################################
 
-out_w_3 <- d_X_week[[3]] 
-for (j in w3) { 
-  out_w_3 <- out_w_3+d_X_week[[j]]
-}
-out_w_3 <- out_w_3 -  d_X_week[[3]]
-plot(out_w_3)
+# month <- as.numeric(X$data$Month)
+# month.tpp <- tpp(month)
+# d_month.tpp <- density(month.tpp)
+# plot(d_month.tpp,xlim=c(1,12))
+# X_month <- as.stlpp(X_unmark,t=month)
+# d_X_month <- density(X_month,dimyx=256)
+# 
+# plot(attr(d_X_month,"tempden")) # density plot
+# 
+# mgrid <- attr(d_X_month,"tempden")$x
+# m1 <- which(mgrid<3.5)
+# m2 <- which(mgrid>=3.5 & mgrid<6.5)
+# m3 <- which(mgrid>=6.5 & mgrid<9.5)
+# m4 <- which(mgrid>=9.5 )
+# 
+# 
+# out_m_1 <- d_X_month[[1]] 
+# for (j in m1) { 
+#   out_m_1 <- out_m_1+d_X_month[[j]]
+# }
+# out_m_1 <- out_m_1 -  d_X_month[[1]]
+# plot(out_m_1)
+# 
+# out_m_2 <- d_X_month[[2]] 
+# for (j in m2) { 
+#   out_m_2 <- out_m_2+d_X_month[[j]]
+# }
+# out_m_2 <- out_m_2 -  d_X_month[[2]]
+# plot(out_m_2)
+# 
+# out_m_3 <- d_X_month[[3]] 
+# for (j in m3) { 
+#   out_m_3 <- out_m_3+d_X_month[[j]]
+# }
+# out_m_3 <- out_m_3 -  d_X_month[[3]]
+# plot(out_m_3)
+# 
+# out_m_4 <- d_X_month[[4]] 
+# for (j in m4) { 
+#   out_m_4 <- out_m_4+d_X_month[[j]]
+# }
+# out_m_4 <- out_m_4 -  d_X_month[[4]]
+# plot(out_m_4)
 
-out_w_4 <- d_X_week[[4]] 
-for (j in w4) { 
-  out_w_4 <- out_w_4+d_X_week[[j]]
-}
-out_w_4 <- out_w_4 -  d_X_week[[4]]
-plot(out_w_4)
+################################################
+################################################
+####################Image#######################
+################################################
+################################################
 
-out_w_5 <- d_X_week[[5]] 
-for (j in w5) { 
-  out_w_5 <- out_w_5+d_X_week[[j]]
-}
-out_w_5 <- out_w_5 -  d_X_week[[5]]
-plot(out_w_5)
-
-out_w_6 <- d_X_week[[6]] 
-for (j in w6) { 
-  out_w_6 <- out_w_6+d_X_week[[j]]
-}
-out_w_6 <- out_w_6 -  d_X_week[[6]]
-plot(out_w_6)
-
-out_w_7 <- d_X_week[[7]] 
-for (j in w7) { 
-  out_w_7 <- out_w_7+d_X_week[[j]]
-}
-out_w_7 <- out_w_7 -  d_X_week[[7]]
-plot(out_w_7)
-
-im_d_w_1 <- raster(as.im(out_w_1))
-im_d_w_2 <- raster(as.im(out_w_2))
-im_d_w_3 <- raster(as.im(out_w_3))
-im_d_w_4 <- raster(as.im(out_w_4))
-im_d_w_5 <- raster(as.im(out_w_5))
-im_d_w_6 <- raster(as.im(out_w_6))
-im_d_w_7 <- raster(as.im(out_w_7))
-
-out_w_stack <- stack(im_d_w_1,im_d_w_2,im_d_w_3,im_d_w_4,im_d_w_5,im_d_w_6,im_d_w_7)
-names(out_w_stack)=c('Sun.','Mon.','Tue.','Wed.','Thu.','Fri.','Sat.')
-
-qtss_w <- as.vector(sort(c(quantile(im_d_w_1*1000,seq(0,1,len=20)),
-                           quantile(im_d_w_2*1000,seq(0,1,len=20)),
-                           quantile(im_d_w_3*1000,seq(0,1,len=20)),
-                           quantile(im_d_w_4*1000,seq(0,1,len=20)),
-                           quantile(im_d_w_5*1000,seq(0,1,len=20)),
-                           quantile(im_d_w_6*1000,seq(0,1,len=20)),
-                           quantile(im_d_w_7*1000,seq(0,1,len=20)))))
-
-png("im_d_w.png",height = 500,width = 800)
-spplot(out_w_stack*1000,at=qtss_w,col.regions=c(viridis(140),rep("#f03b20",6)),
-       par.settings=list(fontsize=list(text=18)),colorkey=list(lables=list(cex=1.5,cex.main=1.5)))                      
-dev.off()
-
-#################################################
-#################################################
-################################################# spatio-temporal by season
-#################################################
-#################################################
-
-month <- as.numeric(X$data$Month)
-X_month <- as.stlpp(X_unmark,t=month)
-d_X_month <- density(X_month,dimyx=256)
-
-plot(attr(d_X_month,"tempden")) # density plot
-
-mgrid <- attr(d_X_month,"tempden")$x
-m1 <- which(mgrid<3.5)
-m2 <- which(mgrid>=3.5 & mgrid<6.5)
-m3 <- which(mgrid>=6.5 & mgrid<9.5)
-m4 <- which(mgrid>=9.5 )
-
-
-out_m_1 <- d_X_month[[1]] 
-for (j in m1) { 
-  out_m_1 <- out_m_1+d_X_month[[j]]
-}
-out_m_1 <- out_m_1 -  d_X_month[[1]]
-plot(out_m_1)
-
-out_m_2 <- d_X_month[[2]] 
-for (j in m2) { 
-  out_m_2 <- out_m_2+d_X_month[[j]]
-}
-out_m_2 <- out_m_2 -  d_X_month[[2]]
-plot(out_m_2)
-
-out_m_3 <- d_X_month[[3]] 
-for (j in m3) { 
-  out_m_3 <- out_m_3+d_X_month[[j]]
-}
-out_m_3 <- out_m_3 -  d_X_month[[3]]
-plot(out_m_3)
-
-out_m_4 <- d_X_month[[4]] 
-for (j in m4) { 
-  out_m_4 <- out_m_4+d_X_month[[j]]
-}
-out_m_4 <- out_m_4 -  d_X_month[[4]]
-plot(out_m_4)
-
-im_d_m_1 <- raster(as.im(out_m_1))
-im_d_m_2 <- raster(as.im(out_m_2))
-im_d_m_3 <- raster(as.im(out_m_3))
-im_d_m_4 <- raster(as.im(out_m_4))
-
-out_m_stack <- stack(im_d_m_1,im_d_m_2,im_d_m_3,im_d_m_4)
-names(out_m_stack)<- c("Jan_March","May_Jun","Jul_Sep","Oct_Dec")
-qtss_m <- as.vector(sort(c(quantile(im_d_m_1*1000,seq(0,1,len=20)),
-                           quantile(im_d_m_2*1000,seq(0,1,len=20)),
-                           quantile(im_d_m_3*1000,seq(0,1,len=20)),
-                           quantile(im_d_m_4*1000,seq(0,1,len=20)))))
-
-
-png("im_d_m.png",height = 800,width = 800)
-spplot(out_m_stack*1000,at=qtss_m,col.regions=c(viridis(80),rep("#f03b20",5)),
-       par.settings=list(fontsize=list(text=18)),colorkey=list(lables=list(cex=1.5,cex.main=1.5)))                      
-dev.off()
-
-
+# im_d_m_1 <- raster(as.im(out_m_1))
+# im_d_m_2 <- raster(as.im(out_m_2))
+# im_d_m_3 <- raster(as.im(out_m_3))
+# im_d_m_4 <- raster(as.im(out_m_4))
+# 
+# out_m_stack <- stack(im_d_m_1,im_d_m_2,im_d_m_3,im_d_m_4)
+# names(out_m_stack)<- c("Jan_March","Apr_Jun","Jul_Sep","Oct_Dec")
+# qtss_m <- as.vector(sort(c(quantile(im_d_m_1*100,seq(0,1,len=20)),
+#                            quantile(im_d_m_2*100,seq(0,1,len=20)),
+#                            quantile(im_d_m_3*100,seq(0,1,len=20)),
+#                            quantile(im_d_m_4*100,seq(0,1,len=20)))))
+# 
+# 
+# png("im_d_m.png",height = 800,width = 800)
+# spplot(out_m_stack*100,at=qtss_m,col.regions=c(viridis(80),rep("#f03b20",5)),
+#        par.settings=list(fontsize=list(text=18)),colorkey=list(lables=list(cex=1.5,cex.main=1.5)))                      
+# dev.off()
 
 ################################################
 ################################################
@@ -311,24 +359,29 @@ dev.off()
 
 hp <- tpp(hour)
 d_hp <- density(hp,at="pixels")
-plot(d_hp,xlim=c(0,23))
+png("d_h.png",width = 800,height = 800)
+par(mar=c(4,10,0,0))
+plot(d_hp,xlim=c(0,23),xlab="time(hour)",cex.axis=2.1,cex.lab=2.5,line=2.5,lwd=2)
+dev.off()
+
+# dp <- tpp(as.numeric(X$data$Weekday))
+# d_dp <- density(dp,at="pixels")
+# 
+# plot(d_dp,xlim=c(1,7),xlab="time(day)",cex.axis=1.5)
+# 
+# mp <- tpp(as.numeric(X$data$Month))
+# d_mp <- density(mp,at="pixels")
+# 
+# plot(d_mp,xlim=c(1,12),xlab="time(month)",cex.axis=1.5)
 
 
-dp <- tpp(as.numeric(X$data$Weekday))
-d_dp <- density(dp,at="pixels")
-plot(d_dp,xlim=c(1,7))
- 
-mp <- tpp(as.numeric(X$data$Month))
-d_mp <- density(mp,at="pixels")
-plot(d_mp,xlim=c(1,12))
 
+####################################################################
+####################################################################
+#########################K-function#################################
+####################################################################
+####################################################################
 
-
-#################################################
-#################################################
-################################################# K-function
-#################################################
-#################################################
 hour <- as.numeric(X$data$Time) # extract time
 
 X_hour <- as.stlpp(X_unmark,t=hour) # create a space-time pattern
@@ -382,6 +435,7 @@ maxEnv <- R_up
 ################################ plot
 library(plot3D)
 ################################# Black&white
+
 png("Second_Order_st.png",height = 800,width = 800)
 plot3D::persp3D(x= K$r/1000,y= K$t,z= K$Kinhom/1000,theta=40,phi=10,
         facets=FALSE,col="red",ticktype= "detailed",bty = "g",
@@ -400,10 +454,6 @@ plot3D::persp3D(K$r/1000,K$t,maxEnv/1000,col = "gray80",add=T,facets=T,
                 nticks=6,cex.axis=1.3,cex.lab=1.7,resfac=4,border = 1)
 
 dev.off()
-
-########## For Presentation <- Annimation
-
-plotrgl()
 
 ################################### P_Value for null hypothesis :=Clustering
 
